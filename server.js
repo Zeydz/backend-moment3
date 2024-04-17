@@ -43,12 +43,8 @@ const workSchema = new mongoose.Schema({
     description: {
         type: String,
         required: true
-    },
-    timestamp: {
-        type: Date,
-        required: true
     }
-});
+}, { timestamps: true });
 
 const WorkExperience = mongoose.model('WorkExperience', workSchema);
 
@@ -72,18 +68,7 @@ app.get('/api/work-experiences', async (req, res) => {
 app.get('/api/work-experiences/:id', (req, res) => {
     const id = req.params.id;
     /* SQL-Fråga som hämtar specifikt ID från databasen. */
-    client.query("SELECT * FROM workexperiences WHERE id = $1", [id], (err, result) => {
-        if (err) {
-            res.status(500).json({ message: "Error retrieving work experience." });
-        } else {
-            /* Kontrollerar ifall där finns data i databasen */
-            if (result.rows.length === 0) {
-                res.status(404).json({ message: "No work experiences found for that specific ID." });
-            } else {
-                res.json(result.rows[0]);
-            }
-        }
-    });
+
 });
 
 /* Route för att lägga till en arbetserfarenhet */
@@ -99,20 +84,29 @@ app.post("/api/work-experiences", async (req, res) => {
 });
 
 /* Route för att ändra/uppdatera en arbetserfarenhet */
-app.put("/api/work-experiences/:id", (req, res) => {
+app.put("/api/work-experiences/:id", async (req, res) => {
     const id = req.params.id;
     const { companyname, jobtitle, location, startdate, enddate, description } = req.body;
 
     /* Uppdatera i databasen */
-    client.query("UPDATE workexperiences SET companyname = $1, jobtitle = $2, location = $3, startdate = $4, enddate = $5, description = $6 WHERE id = $7",
-        [companyname, jobtitle, location, startdate, enddate, description, id],
-        (err, result) => {
-            if (err) {
-                return res.status(500).json({ message: "Error updating work experience." });
-            }
-            res.status(200).json({ message: "Work experience updated successfully." })
+    try {
+        const updatedExperience = await WorkExperience.findByIdAndUpdate(id, {
+            companyname, 
+            jobtitle,
+            location,
+            startdate,
+            enddate,
+            description
+        }, { new: true });
+        
+        if (!updatedExperience) {
+            return res.status(404).json({ message: 'Work experience not found.'})
         }
-    );
+
+        res.status(200).json({ message: 'Work experience updated successfully', data: updatedExperience});
+    } catch(error) {
+        res.status(500).json({ message: 'Error updating work experience ' + error});
+    }
 });
 
 /* Route för att ta bort arbetserfarenhet */
