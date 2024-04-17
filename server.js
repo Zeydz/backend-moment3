@@ -87,23 +87,15 @@ app.get('/api/work-experiences/:id', (req, res) => {
 });
 
 /* Route för att lägga till en arbetserfarenhet */
-app.post("/api/work-experiences", (req, res) => {
-    const { companyname, jobtitle, location, startdate, enddate, description } = req.body;
+app.post("/api/work-experiences", async (req, res) => {
+    try {
+        /* Lägger till värde i databas */
+        let result = await WorkExperience.create(req.body);
 
-    /* Validera att alla fält är ifyllda */
-    if (!companyname || !jobtitle || !location || !startdate || !enddate || !description) {
-        return res.status(400).json({ message: "Please fill in all the required fields." })
+        return res.json(result);
+    } catch(error) {
+        return res.status(400).json(error);
     }
-
-    /* Uppdaterar värde i databas */
-    client.query("INSERT INTO workexperiences (companyname, jobtitle, location, startdate, enddate, description) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
-        [companyname, jobtitle, location, startdate, enddate, description], (err, result) => {
-            if (err) {
-                return res.status(500).json({ message: "Error adding work experience" });
-            }
-            res.status(201).json(result.rows[0]);
-        }
-    );
 });
 
 /* Route för att ändra/uppdatera en arbetserfarenhet */
