@@ -65,9 +65,20 @@ app.get('/api/work-experiences', async (req, res) => {
 });
 
 /* Route för att hämta en specifik arbetserfarenhet */
-app.get('/api/work-experiences/:id', (req, res) => {
+app.get('/api/work-experiences/:id', async (req, res) => {
     const id = req.params.id;
-    /* SQL-Fråga som hämtar specifikt ID från databasen. */
+
+    try {
+        let result = await WorkExperience.findById(id);
+
+        if (!result) {
+            return res.status(404).json({ message: 'Work experience not found. '})
+        }
+
+        return res.json(result);
+    } catch(error) {
+        return res.status(500).json(error);
+    }
 
 });
 
@@ -76,7 +87,6 @@ app.post("/api/work-experiences", async (req, res) => {
     try {
         /* Lägger till värde i databas */
         let result = await WorkExperience.create(req.body);
-
         return res.json(result);
     } catch(error) {
         return res.status(400).json(error);
@@ -87,7 +97,6 @@ app.post("/api/work-experiences", async (req, res) => {
 app.put("/api/work-experiences/:id", async (req, res) => {
     const id = req.params.id;
     const { companyname, jobtitle, location, startdate, enddate, description } = req.body;
-
     /* Uppdatera i databasen */
     try {
         const updatedExperience = await WorkExperience.findByIdAndUpdate(id, {
@@ -98,11 +107,10 @@ app.put("/api/work-experiences/:id", async (req, res) => {
             enddate,
             description
         }, { new: true });
-        
+        /* Extra validation */
         if (!updatedExperience) {
             return res.status(404).json({ message: 'Work experience not found.'})
         }
-
         res.status(200).json({ message: 'Work experience updated successfully', data: updatedExperience});
     } catch(error) {
         res.status(500).json({ message: 'Error updating work experience ' + error});
@@ -110,18 +118,23 @@ app.put("/api/work-experiences/:id", async (req, res) => {
 });
 
 /* Route för att ta bort arbetserfarenhet */
-app.delete("/api/work-experiences/:id", (req, res) => {
+app.delete("/api/work-experiences/:id", async (req, res) => {
     const id = req.params.id;
-    /* SQL-fråga som tar bort ID från databas */
-    client.query("DELETE FROM workexperiences WHERE id = $1",
-    [id],
-    (err, result) => {
-        if (err) {
-            return res.status(500).json({ message: "Error deleting work experience."})
+    /* Ta bort ID */
+    try {
+        const deletedExperience = await WorkExperience.findByIdAndDelete(id);
+
+        /* Extra validation */
+        if (!deletedExperience) {
+            return res.status(404).json({ message: 'Work experience not found'});
         }
-        res.status(200).json ({ message: "Work experience deleted successfully. "})
-    })
+
+        res.status(200).json({ message: 'Work experience deleted successfully.'})
+    } catch(error) {
+        res.status(500).json({ message: 'Error deleting work experience ' + error});
+    }
 });
+
 /* Startar & lyssnar på port */
 app.listen(port, () => {
     console.log('Server is running on port ' + port);
