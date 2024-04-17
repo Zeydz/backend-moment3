@@ -57,7 +57,6 @@ app.get('/api', (req, res) => {
 app.get('/api/work-experiences', async (req, res) => {
     try {
         let result = await WorkExperience.find();
-
         return res.json(result);
     } catch(error) {
         return res.status(500).json(error);
@@ -67,19 +66,17 @@ app.get('/api/work-experiences', async (req, res) => {
 /* Route för att hämta en specifik arbetserfarenhet */
 app.get('/api/work-experiences/:id', async (req, res) => {
     const id = req.params.id;
-
+     /* Extra validation */
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(404).json({ message: 'Work experience not found. '})
+    }
     try {
         let result = await WorkExperience.findById(id);
-
-        if (!result) {
-            return res.status(404).json({ message: 'Work experience not found. '})
-        }
 
         return res.json(result);
     } catch(error) {
         return res.status(500).json(error);
     }
-
 });
 
 /* Route för att lägga till en arbetserfarenhet */
@@ -97,6 +94,10 @@ app.post("/api/work-experiences", async (req, res) => {
 app.put("/api/work-experiences/:id", async (req, res) => {
     const id = req.params.id;
     const { companyname, jobtitle, location, startdate, enddate, description } = req.body;
+   /* Extra validation */
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(404).json({ message: 'Work experience not found. '})
+    }
     /* Uppdatera i databasen */
     try {
         const updatedExperience = await WorkExperience.findByIdAndUpdate(id, {
@@ -108,9 +109,6 @@ app.put("/api/work-experiences/:id", async (req, res) => {
             description
         }, { new: true });
         /* Extra validation */
-        if (!updatedExperience) {
-            return res.status(404).json({ message: 'Work experience not found.'})
-        }
         res.status(200).json({ message: 'Work experience updated successfully', data: updatedExperience});
     } catch(error) {
         res.status(500).json({ message: 'Error updating work experience ' + error});
@@ -120,15 +118,13 @@ app.put("/api/work-experiences/:id", async (req, res) => {
 /* Route för att ta bort arbetserfarenhet */
 app.delete("/api/work-experiences/:id", async (req, res) => {
     const id = req.params.id;
+    /* Extra validation */
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(404).json({ message: 'Work experience not found. '})
+    }
     /* Ta bort ID */
     try {
         const deletedExperience = await WorkExperience.findByIdAndDelete(id);
-
-        /* Extra validation */
-        if (!deletedExperience) {
-            return res.status(404).json({ message: 'Work experience not found'});
-        }
-
         res.status(200).json({ message: 'Work experience deleted successfully.'})
     } catch(error) {
         res.status(500).json({ message: 'Error deleting work experience ' + error});
