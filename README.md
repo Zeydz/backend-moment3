@@ -1,6 +1,6 @@
 # Användarmanual för Work Experience API / Arbetserfarenheter API
 
-Välkommen till Work Experience API! Denna API-tjänst låter dig hantera arbetserfarenheter genom att erbjuda CRUD-operationer (Create, Read, Update, Delete) för att lägga till, hämta, uppdatera och ta bort arbetserfarenheter från en PostgreSQL-databas.
+Välkommen till Work Experience API! Denna API-tjänst låter dig hantera arbetserfarenheter genom att erbjuda CRUD-operationer (Create, Read, Update, Delete) för att lägga till, hämta, uppdatera och ta bort arbetserfarenheter från en MongoDB-databas.
 
 ## Komma igång
 
@@ -10,17 +10,14 @@ För att använda Work Experience API, följ stegen nedan:
 
 2. **Installera nödvändiga paket**: Se till att du har Node.js installerat på din dator. Installera sedan alla nödvändiga paket genom att köra `npm install` i terminalen.
 
-3. **Konfigurera miljövariabler**: Skapa en fil med namnet `.env` i rotmappen och konfigurera miljövariabler för att ansluta till din PostgreSQL-databas. Exempelvis:
+3. **Installera MongoDB**: För att kunna hosta databasen lokalt kommer du behöva ladda ned MongoDB & MongoDB Compass.
+
+4. **Konfigurera miljövariabler**: Skapa en fil med namnet `.env` i rotmappen och konfigurera miljövariabler för att ansluta till din MongoDB-databas (behövs inte om den hostas lokalt på datorn). Exempelvis:
 
   ```plaintext
-    DB_HOST = ""
-    DB_PORT = 5432
-    DB_USERNAME = ""
-    DB_PASSWORD = ""
-    DB_DATABASE = ""
+    PASSWORD = ""
   ```
-3. **Starta servern**: Starta servern genom att köra `npm start` i terminalen. Servern kommer att lyssna på standardporten 3000, om ingen annan port anges i miljövariabler.
-
+5. **Starta servern**: Starta den lokala databasen genom att köra `mongod --dbpath=(path)` i terminalen. 
 ## Använda API:et
 
 API:et erbjuder följande endpoints för att hantera arbetserfarenheter:
@@ -40,7 +37,7 @@ Här är ett exempel på hur du kan använda ThunderClient för att utföra CRUD
 3. För att uppdatera en befintlig arbetserfarenhet, använd PUT-förfrågan till `http://localhost:3000/api/work-experiences/:id` med arbetserfarenhetens ID och uppdaterad data.
 4. För att ta bort en arbetserfarenhet, använd DELETE-förfrågan till `http://localhost:3000/api/work-experiences/:id` med arbetserfarenhetens ID.
 
-[API-länk](https://backend-moment2.onrender.com/api)  
+[API-länk](https://backend-moment3-pbtd.onrender.com/api)  
 
-[Publicerad webbplats](https://astonishing-caramel-f0eafd.netlify.app/)
+[Publicerad webbplats](https://enchanting-druid-0371ad.netlify.app/)
 
